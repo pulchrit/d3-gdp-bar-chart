@@ -1,0 +1,21 @@
+.svgChart {
+    display: block;
+    margin: 2% auto;
+}
+
+.axis {
+    font-size: .7em;
+    color: darkgray;
+}
+
+.domain {
+    stroke: darkgray;
+}
+
+.tick line {
+    stroke: darkgray;
+}
+
+.tick text {
+    fill: darkgray;
+}
