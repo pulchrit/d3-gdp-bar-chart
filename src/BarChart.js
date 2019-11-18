@@ -1,14 +1,30 @@
-import React, { useRef, useEffect } from 'react';
-import './BarChart.css';
+import React, { useRef, useEffect, useState } from 'react';
+import Tooltip from './Tooltip';
 import * as d3 from 'd3';
+import './BarChart.css';
 
 const BarChart = ({ data, size }) => {
 
     // Desctructure width, height, padding.
     const { width, height, padding } = size;
 
+    const [tooltip, setTooltip] = useState(null);
+    console.log(tooltip);
+
     // Get acces to DOM for svg.g. Will create chart here.
     const barRef = useRef();
+
+    // Define xScale as time.
+    const xScale = d3.scaleTime()
+    // Could pull domain vals out of data itself, but it seems 
+    // easier to hard code b/c these are known values for this data set.
+    .domain([new Date("1947-01-01"), new Date("2015-07-01")]).nice()
+    .range([padding, width - padding])
+
+    // Define yScale as linear for $ values.
+    const yScale = d3.scaleLinear()
+        .domain(d3.extent(data, (d) => d[1])).nice()
+        .range([height - padding, padding])
 
     useEffect( () => {
         drawBarChart(data);
@@ -19,7 +35,7 @@ const BarChart = ({ data, size }) => {
         // Access ref (svg.g) to place chart inside. 
         const barChart = d3.select(barRef.current);
 
-        // Define xScale as time.
+        /* // Define xScale as time.
         const xScale = d3.scaleTime()
             // Could pull domain vals out of data itself, but it seems 
             // easier to hard code b/c these are known values for this data set.
@@ -29,7 +45,7 @@ const BarChart = ({ data, size }) => {
         // Define yScale as linear for $ values.
         const yScale = d3.scaleLinear()
             .domain(d3.extent(data, (d) => d[1])).nice()
-            .range([height - padding, padding])
+            .range([height - padding, padding]) */
 
         // Append x axis.
         barChart.append('g')
@@ -62,16 +78,10 @@ const BarChart = ({ data, size }) => {
             .attr('fill', "#03963f")
             .attr('x', (d, i) => xScale(new Date(d[0])))
             .attr('y', (d) => yScale(d[1]))
+            .on('mouseover', (d) => setTooltip(d))
+            .on('mouseout', (d) => setTooltip(null))
         
-        /* // Add text labels to bars.
-        barChart.append('g')
-            .selectAll('text')
-            .data(data)
-            .join('text')
-            .attr('x', (d, i) => xScale(i) + 5)
-            .attr('y', (d) => yScale(d[1]) - 5)
-            .text((d) => d[1])
-            .attr('text-anchor', 'middle'); */
+
     }
 
     return (
@@ -85,7 +95,15 @@ const BarChart = ({ data, size }) => {
                 transform={`translate(0, 0)`}
             />
 
+            { tooltip && 
+                <Tooltip 
+                    selected={tooltip}
+                    xScale={xScale}
+                    yScale={yScale}
+                /> }
+
         </svg>
+
     )
 }
 

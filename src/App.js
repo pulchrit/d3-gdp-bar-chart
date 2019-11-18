@@ -44,7 +44,6 @@ const App = () => {
 
   // Fetch the data
   fetchData();
-  console.log('useEffect ran');
   // Dependency array, will cause rerender only when these values change.
   }, [isError, setData]);
 
